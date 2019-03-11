@@ -4,7 +4,8 @@ import Burger from "../../Components/Burger/Burger.js";
 import BuildControls from "../../Components/Burger/BuildControls/BuildControls";
 import Modal from "../../Components/UI/Modal/Modal";
 import OrderSummary from "../../Components/Burger/OrderSummary/OrderSummary";
-
+//https://www.npmjs.com/package/react-validation
+//https://www.npmjs.com/package/simple-react-validator
 const ingredient_Prices = {
   salad: 1.1,
   cheese: 1.4,
@@ -38,7 +39,9 @@ class burgerBuilder extends Component {
   state = { ...defaultState };
   componentDidMount = () => {};
 
-  updatePurchaseState = ingredients => {
+  updatePurchaseState(ingredients) {
+    console.log("entered");
+    console.log(ingredients);
     const sum = Object.keys(ingredients)
       .map(igKey => {
         return ingredients[igKey];
@@ -46,14 +49,21 @@ class burgerBuilder extends Component {
       .reduce((sum, el) => {
         return sum + el;
       }, 0);
-    this.setState({ purshasable: sum > 0 });
-  };
+    this.setState({ purchasable: sum > 0 });
+  }
 
-  onOrder = () => {
+  OrderHandeler = () => {
     const ord = !this.state.order;
     this.setState({
       order: ord
     });
+  };
+  OrderCancelationHandeler = () => {
+    alert("canceled");
+    this.OrderHandeler();
+  };
+  OrderContinueHandeler = () => {
+    alert("placed");
   };
   onMore = key => {
     const oldCount = this.state.ingredients[key];
@@ -101,9 +111,13 @@ class burgerBuilder extends Component {
     //console.log(this.state.totalPrice);
     return (
       <Aux>
-        <Modal visible={this.state.order}>
-          {" "}
-          <OrderSummary />{" "}
+        <Modal visible={this.state.order} clicked={this.OrderHandeler}>
+          <OrderSummary
+            ingredients={this.state.ingredients}
+            price={this.state.totalPrice.toFixed(2)}
+            cancel={this.OrderCancelationHandeler}
+            continue={this.OrderContinueHandeler}
+          />
         </Modal>
         <Burger ingredients={this.state.ingredients} />
         <BuildControls
@@ -112,7 +126,7 @@ class burgerBuilder extends Component {
           More={this.onMore}
           Less={this.onLess}
           Q={this.state.ingredients}
-          Order={this.onOrder}
+          Order={this.OrderHandeler}
         />
       </Aux>
     );
